@@ -62,7 +62,9 @@
                             "
                             [logo]="channel?.tvg?.logo"
                             (clicked)="selectChannel(channel)"
-                            [selected]="selected?.id === channel?.id"
+                            [selected]="selected?.id === channel?.id || isActiveChannel(channel) || isLastWatchedChannel(channel)"
+                            [attr.data-channel-id]="channel?.id"
+                            [attr.data-last-watched]="isLastWatchedChannel(channel) ? 'true' : null"
                         />
                     </cdk-virtual-scroll-viewport>
                 </mat-nav-list>
@@ -85,9 +87,9 @@
                                 <mat-expansion-panel>
                                     <mat-expansion-panel-header>
                                         {{
-                                            groups.key ||
-                                                ('CHANNELS.UNGROUPED' | translate)
-                                                | titlecase
+                                            groups.key && groups.key.toLowerCase() !== 'undefined'
+                                                ? (groups.key | titlecase)
+                                                : 'Miscellaneous'
                                         }}
                                         ({{ groups.value.length }})
                                     </mat-expansion-panel-header>
@@ -110,8 +112,9 @@
                                                 [logo]="channel?.tvg?.logo"
                                                 (clicked)="selectChannel(channel)"
                                                 [selected]="
-                                                    selected?.id === channel.id
+                                                    selected?.id === channel.id || isActiveChannel(channel)
                                                 "
+                                                [attr.data-channel-id]="channel?.id"
                                             ></app-channel-list-item>
                                         }
                                     </ng-template>
@@ -156,7 +159,8 @@
                                         [isDraggable]="true"
                                         [logo]="channel?.tvg?.logo"
                                         (clicked)="selectChannel(channel)"
-                                        [selected]="selected?.id === channel?.id"
+                                        [selected]="selected?.id === channel?.id || isActiveChannel(channel)"
+                                        [attr.data-channel-id]="channel?.id"
                                         [showFavoriteButton]="true"
                                         (favoriteToggled)="
                                             toggleFavoriteChannel(

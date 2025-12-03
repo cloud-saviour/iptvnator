@@ -34,6 +34,7 @@ import { EpgService } from '../../../services/epg.service';
 import { FilterPipe } from '../../../shared/pipes/filter.pipe';
 import * as PlaylistActions from '../../../state/actions';
 import {
+    selectActive,
     selectActivePlaylistId,
     selectFavorites,
 } from '../../../state/selectors';
@@ -81,7 +82,18 @@ export class ChannelListContainerComponent implements OnDestroy {
     @Input('channelList')
     set channelList(value: Channel[]) {
         this._channelList = value;
-        this.groupedChannels = _.default.groupBy(value, 'group.title');
+        // Group channels, handling undefined/null group titles as "Miscellaneous"
+        this.groupedChannels = _.default.groupBy(value, (channel) => {
+            const groupTitle = channel?.group?.title;
+            if (!groupTitle || groupTitle.trim() === '' || groupTitle.toLowerCase() === 'undefined') {
+                return 'Miscellaneous';
+            }
+            return groupTitle;
+        });
+        // Restore last watched channel when channel list changes
+        if (this._channelList.length > 0) {
+            setTimeout(() => this.restoreLastWatchedChannel(), 200);
+        }
     }
 
     /** Object with channels sorted by groups */
@@ -89,6 +101,12 @@ export class ChannelListContainerComponent implements OnDestroy {
 
     /** Selected channel */
     selected!: Channel;
+
+    /** Active (playing) channel ID */
+    activeChannelId?: string;
+
+    /** Last watched channel ID */
+    lastWatchedChannelId?: string;
 
     /** Search term for channel filter */
     searchTerm: any = {
@@ -158,6 +176,22 @@ export class ChannelListContainerComponent implements OnDestroy {
             .pipe(takeUntil(this.destroy$))
             .subscribe((playlistId) => {
                 this.playlistId = playlistId;
+            });
+
+        // Subscribe to active channel changes for highlighting and auto-scroll
+        this.store
+            .select(selectActive)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe((activeChannel) => {
+                if (activeChannel?.id) {
+                    this.activeChannelId = activeChannel.id;
+                    // Save last watched channel
+                    this.saveLastWatchedChannel(activeChannel.id);
+                    // Scroll to active channel after a short delay to ensure DOM is updated
+                    setTimeout(() => this.scrollToChannel(activeChannel.id), 100);
+                } else {
+                    this.activeChannelId = undefined;
+                }
             });
     }
 
@@ -250,6 +284,93 @@ export class ChannelListContainerComponent implements OnDestroy {
             localStorage.setItem(CHANNEL_LIST_VIEW_MODE_STORAGE_KEY, mode);
         } catch (error) {
             console.error('Error saving channel list view mode preference:', error);
+        }
+    }
+
+    /**
+     * Scrolls to the channel with the given ID
+     */
+    private scrollToChannel(channelId: string): void {
+        if (!channelId) return;
+
+        // Try to find the channel in the list and scroll to it
+        const channelIndex = this._channelList.findIndex(ch => ch.id === channelId);
+        if (channelIndex !== -1) {
+            // Use the virtual scroll viewport if available
+            const viewport = document.querySelector('#all-channels .scroll-viewport') as HTMLElement;
+            if (viewport) {
+                // Calculate the scroll position for virtual scroll
+                const itemSize = 50; // Matches itemSize in template
+                const targetScroll = channelIndex * itemSize;
+                viewport.scrollTo({
+                    top: Math.max(0, targetScroll - 100), // Offset by 100px to show some context above
+                    behavior: 'smooth'
+                });
+            }
+
+            // Also try to scroll to the element in the groups list
+            const channelElement = document.querySelector(`[data-channel-id="${channelId}"]`);
+            if (channelElement) {
+                channelElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+    }
+
+    /**
+     * Checks if a channel is currently active (playing)
+     */
+    isActiveChannel(channel: Channel): boolean {
+        return this.activeChannelId === channel?.id;
+    }
+
+    /**
+     * Checks if a channel was the last watched channel
+     */
+    isLastWatchedChannel(channel: Channel): boolean {
+        return this.lastWatchedChannelId === channel?.id && !this.isActiveChannel(channel);
+    }
+
+    /**
+     * Saves the last watched channel ID to localStorage
+     */
+    private saveLastWatchedChannel(channelId: string): void {
+        try {
+            const storageKey = `lastWatchedChannel_${this.playlistId || 'default'}`;
+            localStorage.setItem(storageKey, channelId);
+        } catch (error) {
+            console.error('Error saving last watched channel:', error);
+        }
+    }
+
+    /**
+     * Restores and scrolls to the last watched channel
+     */
+    private restoreLastWatchedChannel(): void {
+        try {
+            const storageKey = `lastWatchedChannel_${this.playlistId || 'default'}`;
+            const lastChannelId = localStorage.getItem(storageKey);
+            
+            if (lastChannelId && this._channelList.length > 0) {
+                // Check if the channel still exists in the current playlist
+                const channelExists = this._channelList.some(ch => ch.id === lastChannelId);
+                
+                if (channelExists) {
+                    // Set last watched channel ID for highlighting
+                    this.lastWatchedChannelId = lastChannelId;
+                    // Wait for DOM to be ready, then scroll to the channel
+                    setTimeout(() => {
+                        this.scrollToChannel(lastChannelId);
+                    }, 300);
+                } else {
+                    // Channel no longer exists, remove from storage
+                    localStorage.removeItem(storageKey);
+                    this.lastWatchedChannelId = undefined;
+                }
+            } else {
+                this.lastWatchedChannelId = undefined;
+            }
+        } catch (error) {
+            console.error('Error restoring last watched channel:', error);
         }
     }
 }
