@@ -12,7 +12,7 @@ import { addPlaylist } from '../state/actions';
 import { RecentPlaylistsComponent } from './recent-playlists/recent-playlists.component';
 
 @Component({
-    selector: 'app-home',
+    selector: 'app-manage-playlist',
     templateUrl: './home.component.html',
     styleUrls: ['./home.component.scss'],
     imports: [
@@ -22,7 +22,7 @@ import { RecentPlaylistsComponent } from './recent-playlists/recent-playlists.co
     TranslatePipe
 ],
 })
-export class HomeComponent {
+export class ManagePlaylistComponent {
     /** Loading spinner state */
     isLoading = false;
 

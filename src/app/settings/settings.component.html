@@ -359,6 +359,25 @@
       }
 
       <mat-divider />
+      <div class="row">
+        <div class="column">
+          Manage Playlists
+          <p>Add, edit, or remove playlists</p>
+        </div>
+        <div class="column">
+          <button
+            mat-button
+            color="accent"
+            type="button"
+            (click)="navigateToHome()"
+            data-test-id="go-to-home"
+            >
+            <mat-icon>playlist_add</mat-icon>
+            Go To Manage Playlists
+          </button>
+        </div>
+      </div>
+      <mat-divider />
       <div class="action-buttons" align="end">
         <button
           mat-button

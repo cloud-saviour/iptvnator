@@ -14,7 +14,7 @@ import { Store } from '@ngrx/store';
 import { TranslateModule } from '@ngx-translate/core';
 import { open } from '@tauri-apps/plugin-shell';
 import { NgxWhatsNewModule } from 'ngx-whats-new';
-import { HomeComponent } from '../../../home/home.component';
+import { ManagePlaylistComponent } from '../../../home/home.component';
 import { DataService } from '../../../services/data.service';
 import { SortBy, SortOrder, SortService } from '../../../services/sort.service';
 import { WhatsNewService } from '../../../services/whats-new.service';
@@ -118,7 +118,7 @@ export class HeaderComponent implements OnInit {
 
     ngOnInit() {
         this.isHome =
-            this.activatedRoute.snapshot.component.name === HomeComponent.name;
+            this.activatedRoute.snapshot.component.name === ManagePlaylistComponent.name;
     }
 
     /**

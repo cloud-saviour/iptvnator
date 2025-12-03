@@ -14,11 +14,18 @@ const routes: Routes = [
             ),
     },
     {
+        path: 'manage-playlist',
+        loadComponent: () =>
+            import('./home/home.component').then((c) => c.ManagePlaylistComponent),
+        // Uncomment the line below to protect the manage-playlist route
+        // canActivate: [authGuard],
+    },
+    {
         path: '',
         loadComponent: () =>
-            import('./home/home.component').then((c) => c.HomeComponent),
-        // Uncomment the line below to protect the home route
-        // canActivate: [authGuard],
+            import(
+                './player/components/netflix-view/netflix-view.component'
+            ).then((c) => c.NetflixViewComponent),
     },
     {
         path: 'playlists',
@@ -46,6 +53,13 @@ const routes: Routes = [
             ).then((c) => c.VideoPlayerComponent),
         // Uncomment the line below to protect this route
         // canActivate: [authGuard],
+    },
+    {
+        path: 'netflix',
+        loadComponent: () =>
+            import(
+                './player/components/netflix-view/netflix-view.component'
+            ).then((c) => c.NetflixViewComponent),
     },
     {
         path: 'netflix/:id',
@@ -84,7 +98,7 @@ const routes: Routes = [
     ...stalkerRoutes,
     {
         path: '**',
-        redirectTo: '',
+        redirectTo: '/',
     },
 ];
 

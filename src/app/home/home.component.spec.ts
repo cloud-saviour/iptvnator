@@ -12,12 +12,12 @@ import { MockComponent, MockModule, MockProvider } from 'ng-mocks';
 import { Observable } from 'rxjs';
 import { DataService } from '../services/data.service';
 import { ElectronServiceStub } from '../services/electron.service.stub';
-import { HomeComponent } from './home.component';
+import { ManagePlaylistComponent } from './home.component';
 import { RecentPlaylistsComponent } from './recent-playlists/recent-playlists.component';
 
-describe('HomeComponent', () => {
-    let component: HomeComponent;
-    let fixture: ComponentFixture<HomeComponent>;
+describe('ManagePlaylistComponent', () => {
+    let component: ManagePlaylistComponent;
+    let fixture: ComponentFixture<ManagePlaylistComponent>;
     let electronService: DataService;
     let mockStore: MockStore;
     const actions$ = new Observable<Actions>();
@@ -25,7 +25,7 @@ describe('HomeComponent', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [
-                HomeComponent,
+                ManagePlaylistComponent,
                 CommonModule,
                 MockComponent(RecentPlaylistsComponent),
                 MockModule(MatProgressBarModule),
@@ -47,7 +47,7 @@ describe('HomeComponent', () => {
     });
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(HomeComponent);
+        fixture = TestBed.createComponent(ManagePlaylistComponent);
         component = fixture.componentInstance;
         electronService = TestBed.inject(DataService);
 

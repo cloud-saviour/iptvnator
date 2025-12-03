@@ -331,6 +331,16 @@ export class SettingsComponent implements OnInit {
     }
 
     /**
+     * Navigates to the manage playlist page
+     */
+    navigateToHome(): void {
+        if (this.isDialog) {
+            this.matDialog.closeAll();
+        }
+        this.router.navigate(['/manage-playlist']);
+    }
+
+    /**
      * Fetches and updates EPG from the given URL
      * @param url epg source url
      */

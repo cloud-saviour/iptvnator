@@ -7,7 +7,7 @@ import { MatIconButton } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Store } from '@ngrx/store';
 import { TranslatePipe } from '@ngx-translate/core';
-import { map, switchMap } from 'rxjs';
+import { map, switchMap, take } from 'rxjs';
 import { Channel } from '../../../../../shared/channel.interface';
 import { PlaylistsService } from '../../../services/playlists.service';
 import { DataService } from '../../../services/data.service';
@@ -88,13 +88,37 @@ export class NetflixViewComponent implements OnInit, OnDestroy {
                                 return playlist.playlist.items as Channel[];
                             })
                         );
+                    } else {
+                        // No ID provided, try to load the first playlist
+                        return this.playlistsService.getAllPlaylists().pipe(
+                            take(1),
+                            switchMap((playlists) => {
+                                // Find the first regular playlist (not xtream/stalker)
+                                const firstPlaylist = playlists.find(
+                                    (p) => !p.serverUrl && !p.macAddress
+                                );
+                                
+                                if (firstPlaylist) {
+                                    // Navigate to the first playlist
+                                    this.router.navigate(['/netflix', firstPlaylist._id], {
+                                        replaceUrl: true
+                                    });
+                                    return [];
+                                }
+                                
+                                // No playlists available
+                                this.isLoading = false;
+                                return [];
+                            })
+                        );
                     }
-                    return [];
                 })
             )
-                            .subscribe({
+            .subscribe({
                 next: (channels) => {
-                    this.channels = channels;
+                    if (channels && channels.length > 0) {
+                        this.channels = channels;
+                    }
                     this.isLoading = false;
                 },
                 error: (error) => {
