@@ -14,10 +14,11 @@ import { Store } from '@ngrx/store';
 import { TranslateModule } from '@ngx-translate/core';
 import { open } from '@tauri-apps/plugin-shell';
 import { NgxWhatsNewModule } from 'ngx-whats-new';
-import { ManagePlaylistComponent } from '../../../home/home.component';
+import { ManagePlaylistComponent } from '../../../home/manage-playlists.component';
 import { DataService } from '../../../services/data.service';
 import { SortBy, SortOrder, SortService } from '../../../services/sort.service';
 import { WhatsNewService } from '../../../services/whats-new.service';
+import { AuthService } from '../../../services/auth/auth.service';
 import { setSelectedFilters } from '../../../state/actions';
 import { selectActiveTypeFilters } from '../../../state/selectors';
 import { AboutDialogComponent } from '../about-dialog/about-dialog.component';
@@ -67,6 +68,9 @@ export class HeaderComponent implements OnInit {
     /** Modals to show for the updated version of the application */
     modals = this.whatsNewService.getLatestChanges();
 
+    /** Authentication status */
+    isAuthenticated$ = this.authService.isAuthenticated$;
+
     isHome = true;
 
     playlistTypes = [
@@ -100,7 +104,8 @@ export class HeaderComponent implements OnInit {
         private router: Router,
         private store: Store,
         private whatsNewService: WhatsNewService,
-        private sortService: SortService
+        private sortService: SortService,
+        private authService: AuthService
     ) {
         effect(() => {
             if (this.selectedTypeFilters) {
@@ -191,5 +196,14 @@ export class HeaderComponent implements OnInit {
             this.currentSortOptions?.by === by &&
             this.currentSortOptions?.order === order
         );
+    }
+
+    /**
+     * Logs out the current user
+     */
+    logout(): void {
+        this.authService.logout().catch((error) => {
+            console.error('Error during logout:', error);
+        });
     }
 }

@@ -16,9 +16,8 @@ const routes: Routes = [
     {
         path: 'manage-playlist',
         loadComponent: () =>
-            import('./home/home.component').then((c) => c.ManagePlaylistComponent),
-        // Uncomment the line below to protect the manage-playlist route
-        // canActivate: [authGuard],
+            import('./home/manage-playlists.component').then((c) => c.ManagePlaylistComponent),
+        canActivate: [authGuard],
     },
     {
         path: '',
@@ -26,6 +25,7 @@ const routes: Routes = [
             import(
                 './player/components/netflix-view/netflix-view.component'
             ).then((c) => c.NetflixViewComponent),
+        canActivate: [authGuard],
     },
     {
         path: 'playlists',
@@ -33,8 +33,7 @@ const routes: Routes = [
             import(
                 './player/components/video-player/video-player.component'
             ).then((c) => c.VideoPlayerComponent),
-        // Uncomment the line below to protect this route
-        // canActivate: [authGuard],
+        canActivate: [authGuard],
     },
     {
         path: 'iptv',
@@ -42,8 +41,7 @@ const routes: Routes = [
             import(
                 './player/components/video-player/video-player.component'
             ).then((c) => c.VideoPlayerComponent),
-        // Uncomment the line below to protect this route
-        // canActivate: [authGuard],
+        canActivate: [authGuard],
     },
     {
         path: 'playlists/:id',
@@ -51,22 +49,23 @@ const routes: Routes = [
             import(
                 './player/components/video-player/video-player.component'
             ).then((c) => c.VideoPlayerComponent),
-        // Uncomment the line below to protect this route
-        // canActivate: [authGuard],
+        canActivate: [authGuard],
     },
     {
-        path: 'netflix',
+        path: 'csiptv',
         loadComponent: () =>
             import(
                 './player/components/netflix-view/netflix-view.component'
             ).then((c) => c.NetflixViewComponent),
+        canActivate: [authGuard],
     },
     {
-        path: 'netflix/:id',
+        path: 'csiptv/:id',
         loadComponent: () =>
             import(
                 './player/components/netflix-view/netflix-view.component'
             ).then((c) => c.NetflixViewComponent),
+        canActivate: [authGuard],
     },
     {
         path: 'settings',
@@ -74,8 +73,7 @@ const routes: Routes = [
             import('./settings/settings.component').then(
                 (c) => c.SettingsComponent
             ),
-        // Uncomment the line below to protect this route
-        // // canActivate: [authGuard],
+        canActivate: [authGuard],
     },
     ...(isTauri()
         ? xtreamRoutes

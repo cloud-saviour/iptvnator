@@ -32,6 +32,16 @@
                     class="settings-button">
                     <mat-icon>settings</mat-icon>
                 </button>
+                @if (isAuthenticated$ | async) {
+                    <button
+                        mat-icon-button
+                        (click)="logout()"
+                        [matTooltip]="'MENU.LOGOUT' | translate"
+                        class="logout-button"
+                        data-test-id="logout">
+                        <mat-icon>logout</mat-icon>
+                    </button>
+                }
             </div>
         }
     </div>

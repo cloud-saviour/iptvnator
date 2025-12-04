@@ -12,7 +12,7 @@ import { MockComponent, MockModule, MockProvider } from 'ng-mocks';
 import { Observable } from 'rxjs';
 import { DataService } from '../services/data.service';
 import { ElectronServiceStub } from '../services/electron.service.stub';
-import { ManagePlaylistComponent } from './home.component';
+import { ManagePlaylistComponent } from './manage-playlists.component';
 import { RecentPlaylistsComponent } from './recent-playlists/recent-playlists.component';
 
 describe('ManagePlaylistComponent', () => {
@@ -75,3 +75,5 @@ describe('ManagePlaylistComponent', () => {
         );
     });
 });
+
+

@@ -6,8 +6,8 @@
         <div class="title">{{ title }}</div>
         <div class="subtitle">{{ subtitle }}</div>
     </div>
-    @if (isHome) {
-        <div class="menu">
+    <div class="menu">
+        @if (isHome) {
             <button
                 mat-icon-button
                 class="add-playlist-btn"
@@ -34,83 +34,6 @@
             >
                 <mat-icon>filter_alt</mat-icon>
             </button>
-            @if (isElectron || isTauri) {
-                <button
-                    mat-icon-button
-                    (click)="openSettings()"
-                    [matTooltip]="'MENU.SETTINGS' | translate"
-                    data-test-id="open-settings"
-                >
-                    <mat-icon>settings</mat-icon>
-                </button>
-            } @else {
-                <button
-                    mat-icon-button
-                    [matMenuTriggerFor]="menu"
-                    [attr.aria-label]="'MENU.OPEN' | translate"
-                    data-test-id="pwa-menu"
-                >
-                    <mat-icon>menu</mat-icon>
-                </button>
-                <mat-menu #menu="matMenu">
-                    @if (isHome) {
-                        <button
-                            mat-menu-item
-                            [attr.aria-label]="'MENU.SETTINGS_ARIA' | translate"
-                            (click)="openSettings()"
-                            data-test-id="pwa-open-settings"
-                        >
-                            <mat-icon>settings</mat-icon>
-                            <span>{{ 'MENU.SETTINGS' | translate }}</span>
-                        </button>
-                        <mat-divider></mat-divider>
-                    }
-                    <button
-                        mat-menu-item
-                        [attr.aria-label]="'MENU.SUPPORT_ARIA' | translate"
-                        (click)="openUrl('https:///github.com/cloud-saviour/csiptv')"
-                    >
-                        <mat-icon>recommend</mat-icon>
-                        <span>GitHub</span>
-                    </button>
-                    <button
-                        mat-menu-item
-                        [attr.aria-label]="'MENU.BUG_REPORT' | translate"
-                        (click)="
-                            openUrl('https://github.com/cloud-saviour/csiptv/issues')
-                        "
-                    >
-                        <mat-icon>bug_report</mat-icon>
-                        <span>{{ 'MENU.BUG_REPORT' | translate }}</span>
-                    </button>
-                    <mat-divider></mat-divider>
-                    <button
-                        mat-menu-item
-                        [attr.aria-label]="'MENU.WHAT_IS_NEW' | translate"
-                        (click)="setDialogVisibility(true)"
-                    >
-                        <mat-icon>new_releases</mat-icon>
-                        <span>{{ 'MENU.WHAT_IS_NEW' | translate }}</span>
-                    </button>
-                    <button
-                        mat-menu-item
-                        [attr.aria-label]="'MENU.SUPPORT_PROJECT' | translate"
-                        (click)="openUrl('https://github.com/sponsors/cloud-saviour')"
-                    >
-                        <mat-icon>savings</mat-icon>
-                        <span>{{ 'MENU.SUPPORT_PROJECT' | translate }}</span>
-                    </button>
-                    <mat-divider></mat-divider>
-                    <button
-                        mat-menu-item
-                        [attr.aria-label]="'MENU.ABOUT_ARIA' | translate"
-                        (click)="openAboutDialog()"
-                    >
-                        <mat-icon>info</mat-icon>
-                        <span>{{ 'MENU.ABOUT' | translate }}</span>
-                    </button>
-                </mat-menu>
-            }
             <!-- Sort menu -->
             <mat-menu #sortMenu="matMenu">
                 <div
@@ -232,8 +155,106 @@
                     }}</span>
                 </button>
             </mat-menu>
-        </div>
-    }
+        }
+        @if (isElectron || isTauri) {
+            <button
+                mat-icon-button
+                (click)="openSettings()"
+                [matTooltip]="'MENU.SETTINGS' | translate"
+                data-test-id="open-settings"
+            >
+                <mat-icon>settings</mat-icon>
+            </button>
+            @if (isAuthenticated$ | async) {
+                <button
+                    mat-icon-button
+                    (click)="logout()"
+                    [matTooltip]="'MENU.LOGOUT' | translate"
+                    data-test-id="logout"
+                >
+                    <mat-icon>logout</mat-icon>
+                </button>
+            }
+        } @else {
+                <button
+                    mat-icon-button
+                    [matMenuTriggerFor]="menu"
+                    [attr.aria-label]="'MENU.OPEN' | translate"
+                    data-test-id="pwa-menu"
+                >
+                    <mat-icon>menu</mat-icon>
+                </button>
+                <mat-menu #menu="matMenu">
+                    <button
+                        mat-menu-item
+                        [attr.aria-label]="'MENU.SETTINGS_ARIA' | translate"
+                        (click)="openSettings()"
+                        data-test-id="pwa-open-settings"
+                    >
+                        <mat-icon>settings</mat-icon>
+                        <span>{{ 'MENU.SETTINGS' | translate }}</span>
+                    </button>
+                    @if (isAuthenticated$ | async) {
+                        <button
+                            mat-menu-item
+                            [attr.aria-label]="'MENU.LOGOUT_ARIA' | translate"
+                            (click)="logout()"
+                            data-test-id="pwa-logout"
+                        >
+                            <mat-icon>logout</mat-icon>
+                            <span>{{ 'MENU.LOGOUT' | translate }}</span>
+                        </button>
+                    }
+                    @if (isHome) {
+                        <mat-divider></mat-divider>
+                    }
+                    <button
+                        mat-menu-item
+                        [attr.aria-label]="'MENU.SUPPORT_ARIA' | translate"
+                        (click)="openUrl('https:///github.com/cloud-saviour/csiptv')"
+                    >
+                        <mat-icon>recommend</mat-icon>
+                        <span>GitHub</span>
+                    </button>
+                    <button
+                        mat-menu-item
+                        [attr.aria-label]="'MENU.BUG_REPORT' | translate"
+                        (click)="
+                            openUrl('https://github.com/cloud-saviour/csiptv/issues')
+                        "
+                    >
+                        <mat-icon>bug_report</mat-icon>
+                        <span>{{ 'MENU.BUG_REPORT' | translate }}</span>
+                    </button>
+                    <mat-divider></mat-divider>
+                    <button
+                        mat-menu-item
+                        [attr.aria-label]="'MENU.WHAT_IS_NEW' | translate"
+                        (click)="setDialogVisibility(true)"
+                    >
+                        <mat-icon>new_releases</mat-icon>
+                        <span>{{ 'MENU.WHAT_IS_NEW' | translate }}</span>
+                    </button>
+                    <button
+                        mat-menu-item
+                        [attr.aria-label]="'MENU.SUPPORT_PROJECT' | translate"
+                        (click)="openUrl('https://github.com/sponsors/cloud-saviour')"
+                    >
+                        <mat-icon>savings</mat-icon>
+                        <span>{{ 'MENU.SUPPORT_PROJECT' | translate }}</span>
+                    </button>
+                    <mat-divider></mat-divider>
+                    <button
+                        mat-menu-item
+                        [attr.aria-label]="'MENU.ABOUT_ARIA' | translate"
+                        (click)="openAboutDialog()"
+                    >
+                        <mat-icon>info</mat-icon>
+                        <span>{{ 'MENU.ABOUT' | translate }}</span>
+                    </button>
+                </mat-menu>
+        }
+    </div>
 </mat-toolbar>
 
 @if (!isElectron && isDialogVisible$ | async) {

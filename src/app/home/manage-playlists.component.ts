@@ -13,8 +13,8 @@ import { RecentPlaylistsComponent } from './recent-playlists/recent-playlists.co
 
 @Component({
     selector: 'app-manage-playlist',
-    templateUrl: './home.component.html',
-    styleUrls: ['./home.component.scss'],
+    templateUrl: './manage-playlists.component.html',
+    styleUrls: ['./manage-playlists.component.scss'],
     imports: [
     HeaderComponent,
     MatProgressBarModule,
@@ -104,3 +104,5 @@ export class ManagePlaylistComponent {
         }
     }
 }
+
+

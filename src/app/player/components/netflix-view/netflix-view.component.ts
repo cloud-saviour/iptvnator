@@ -11,6 +11,7 @@ import { map, switchMap, take } from 'rxjs';
 import { Channel } from '../../../../../shared/channel.interface';
 import { PlaylistsService } from '../../../services/playlists.service';
 import { DataService } from '../../../services/data.service';
+import { AuthService } from '../../../services/auth/auth.service';
 import { CHANNEL_SET_USER_AGENT } from '../../../../../shared/ipc-commands';
 import * as PlaylistActions from '../../../state/actions';
 import { NetflixGridComponent } from '../netflix-grid/netflix-grid.component';
@@ -31,6 +32,7 @@ const NETFLIX_VIEW_MODE_STORAGE_KEY = 'netflix-view-mode';
         MatIconButton,
         MatTooltipModule,
         TranslatePipe,
+        AsyncPipe,
     ],
 })
 export class NetflixViewComponent implements OnInit, OnDestroy {
@@ -38,13 +40,15 @@ export class NetflixViewComponent implements OnInit, OnDestroy {
     isLoading = true;
     viewMode: 'list' | 'grid' = 'grid';
     playlistId: string | undefined;
+    isAuthenticated$ = this.authService.isAuthenticated$;
 
     constructor(
         private activatedRoute: ActivatedRoute,
         private dataService: DataService,
         private playlistsService: PlaylistsService,
         private store: Store,
-        private router: Router
+        private router: Router,
+        private authService: AuthService
     ) {}
 
     ngOnInit(): void {
@@ -100,7 +104,7 @@ export class NetflixViewComponent implements OnInit, OnDestroy {
                                 
                                 if (firstPlaylist) {
                                     // Navigate to the first playlist
-                                    this.router.navigate(['/netflix', firstPlaylist._id], {
+                                    this.router.navigate(['/csiptv', firstPlaylist._id], {
                                         replaceUrl: true
                                     });
                                     return [];
@@ -163,6 +167,15 @@ export class NetflixViewComponent implements OnInit, OnDestroy {
         const currentUrl = this.router.url;
         this.router.navigate(['/settings'], {
             state: { returnUrl: currentUrl }
+        });
+    }
+
+    /**
+     * Logs out the current user
+     */
+    logout(): void {
+        this.authService.logout().catch((error) => {
+            console.error('Error during logout:', error);
         });
     }
 }

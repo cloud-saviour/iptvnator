@@ -235,6 +235,8 @@
     "SUPPORT_ARIA": "Support CSIPTV on GitHub",
     "SETTINGS": "Settings",
     "SETTINGS_ARIA": "Open settings",
+    "LOGOUT": "Logout",
+    "LOGOUT_ARIA": "Logout from the application",
     "BUG_REPORT": "Report a bug",
     "WHAT_IS_NEW": "What is new",
     "ABOUT": "About",
