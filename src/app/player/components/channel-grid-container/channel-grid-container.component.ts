@@ -3,6 +3,7 @@ import {
     ElementRef,
     HostListener,
     Input,
+    OnDestroy,
     ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -19,7 +20,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { Channel } from '../../../../../shared/channel.interface';
 import * as PlaylistActions from '../../../state/actions';
 import { EpgService } from '../../../services/epg.service';
-import { selectFavorites } from '../../../state/selectors';
+import { selectActive, selectFavorites } from '../../../state/selectors';
 
 @Component({
     selector: 'app-channel-grid-container',
@@ -36,7 +37,7 @@ import { selectFavorites } from '../../../state/selectors';
         TranslateModule,
     ],
 })
-export class ChannelGridContainerComponent {
+export class ChannelGridContainerComponent implements OnDestroy {
     private readonly destroy$ = new Subject<void>();
     private favoriteIds = new Set<string>();
     private _channelList: Channel[] = [];
@@ -46,6 +47,7 @@ export class ChannelGridContainerComponent {
     filteredChannels: Channel[] = [];
     searchTerm = '';
     selectedChannelId?: string;
+    activeChannelId?: string;
 
     @Input()
     set channelList(value: Channel[] | null | undefined) {
@@ -67,6 +69,20 @@ export class ChannelGridContainerComponent {
             .pipe(takeUntil(this.destroy$))
             .subscribe((favoriteUrls) => {
                 this.favoriteIds = new Set(favoriteUrls ?? []);
+            });
+
+        // Subscribe to active channel changes for highlighting and auto-scroll
+        this.store
+            .select(selectActive)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe((activeChannel) => {
+                if (activeChannel?.id) {
+                    this.activeChannelId = activeChannel.id;
+                    // Scroll to active channel after a short delay to ensure DOM is updated
+                    setTimeout(() => this.scrollToChannel(activeChannel.id), 100);
+                } else {
+                    this.activeChannelId = undefined;
+                }
             });
     }
 
@@ -140,6 +156,50 @@ export class ChannelGridContainerComponent {
         if (event.ctrlKey && event.key.toLowerCase() === 'f') {
             event.preventDefault();
             this.searchInput?.nativeElement.focus();
+        }
+    }
+
+    /**
+     * Scrolls to the channel with the given ID in the grid view
+     */
+    private scrollToChannel(channelId: string): void {
+        if (!channelId) return;
+
+        // Find the channel element by data attribute
+        const channelElement = document.querySelector(
+            `[data-channel-id="${channelId}"]`
+        ) as HTMLElement;
+        
+        if (channelElement) {
+            // Find the scrollable parent container (grid container)
+            const gridContainer = channelElement.closest('.grid') as HTMLElement;
+            
+            if (gridContainer) {
+                // Calculate position relative to the scrollable container
+                const containerRect = gridContainer.getBoundingClientRect();
+                const elementRect = channelElement.getBoundingClientRect();
+                
+                // Calculate the scroll position needed to center the element
+                const scrollTop = gridContainer.scrollTop;
+                const elementOffsetTop = elementRect.top - containerRect.top + scrollTop;
+                const containerHeight = gridContainer.clientHeight;
+                const elementHeight = channelElement.offsetHeight;
+                
+                // Center the element vertically in the container
+                const targetScrollTop = elementOffsetTop - (containerHeight / 2) + (elementHeight / 2);
+                
+                gridContainer.scrollTo({
+                    top: Math.max(0, targetScrollTop),
+                    behavior: 'smooth'
+                });
+            } else {
+                // Fallback to standard scrollIntoView if no scrollable parent found
+                channelElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center',
+                    inline: 'nearest'
+                });
+            }
         }
     }
 }

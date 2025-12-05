@@ -38,7 +38,8 @@
                     class="grid-card"
                     tabindex="0"
                     role="listitem"
-                    [class.active]="selectedChannelId === channel?.id"
+                    [class.active]="selectedChannelId === channel?.id || activeChannelId === channel?.id"
+                    [attr.data-channel-id]="channel?.id"
                     (keydown)="onCardKeyDown($event, channel)"
                     (click)="selectChannel(channel)">
                     <div class="card-header">
